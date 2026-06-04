@@ -1,204 +1,206 @@
-```javascript
-let rawData=[];
+const fields=['order_type','network_type','service_type','install_type','technology_type','product_type','action_type'];
 
-const filters=[
-"order_type",
-"network_type",
-"service_type",
-"install_type",
-"technology_type",
-"product_type",
-"action_type"
-];
+let data=[];
 
-Papa.parse("./workflow_templates_master.csv",{
-download:true,
-header:true,
-complete:function(results){
-
-rawData=results.data.filter(r=>r.task_name);
-
-initializeFilters();
-
-}
+fetch('workflow_data.json')
+.then(r=>r.json())
+.then(d=>{
+    data=d;
+    buildFilters();
 });
 
-function initializeFilters(){
+function buildFilters(){
 
-populateFilter("order_type",rawData);
+    const container=document.getElementById('filters');
 
-filters.forEach((f,index)=>{
+    fields.forEach(field=>{
 
-document.getElementById(f)
-.addEventListener("change",()=>{
+        const div=document.createElement('div');
 
-updateCascade(index);
+        div.innerHTML=`
+            <label>${field.replaceAll('_',' ').replace(/\b\w/g,m=>m.toUpperCase())}</label>
+            <select id="${field}">
+                <option value="">Select...</option>
+            </select>
+        `;
 
-});
+        container.appendChild(div);
 
-});
+    });
 
-}
+    populateFromLevel(0);
 
-function populateFilter(id,data){
+    fields.forEach((field,index)=>{
 
-let select=document.getElementById(id);
+        document
+        .getElementById(field)
+        .addEventListener('change',()=>{
 
-let current=select.value;
+            handleChange(index);
 
-let values=[...new Set(
-data.map(x=>x[id]).filter(v=>v)
-)].sort();
+        });
 
-select.innerHTML="<option value=''>Select...</option>";
-
-values.forEach(v=>{
-
-let option=document.createElement("option");
-option.value=v;
-option.textContent=v;
-
-select.appendChild(option);
-
-});
-
-if(values.includes(current))
-select.value=current;
+    });
 
 }
 
-function updateCascade(changedIndex){
+function populateFromLevel(level){
 
-for(let i=changedIndex+1;i<filters.length;i++){
+    for(let i=level;i<fields.length;i++){
 
-document.getElementById(filters[i]).value="";
+        let filtered=data;
 
-}
+        for(let j=0;j<i;j++){
 
-let filtered=rawData;
+            const value=
+            document.getElementById(fields[j]).value;
 
-for(let i=0;i<=changedIndex;i++){
+            if(value){
 
-let field=filters[i];
-let value=document.getElementById(field).value;
+                filtered=
+                filtered.filter(
+                    r=>r[fields[j]]===value
+                );
 
-if(value){
+            }
 
-filtered=filtered.filter(
-r=>r[field]===value
-);
+        }
 
-}
+        const values=[
+            ...new Set(
+                filtered
+                .map(r=>r[fields[i]])
+                .filter(v=>v)
+            )
+        ].sort();
 
-}
+        const select=
+        document.getElementById(fields[i]);
 
-for(let i=changedIndex+1;i<filters.length;i++){
+        select.innerHTML=
+        `<option value="">Select...</option>`;
 
-populateFilter(filters[i],filtered);
+        values.forEach(v=>{
 
-}
+            select.innerHTML+=
+            `<option value="${v}">${v}</option>`;
 
-renderResults(getCurrentFilteredData());
+        });
 
-}
-
-function getCurrentFilteredData(){
-
-let filtered=rawData;
-
-filters.forEach(f=>{
-
-let value=document.getElementById(f).value;
-
-if(value){
-
-filtered=filtered.filter(
-r=>r[f]===value
-);
+    }
 
 }
 
-});
+function handleChange(level){
 
-return filtered;
+    for(let i=level+1;i<fields.length;i++){
 
-}
+        document
+        .getElementById(fields[i])
+        .value='';
 
-function renderResults(rows){
+    }
 
-let tbody=document.querySelector("#resultsTable tbody");
+    populateFromLevel(level+1);
 
-tbody.innerHTML="";
-
-if(rows.length===0){
-
-document.getElementById("population").innerText="0";
-document.getElementById("mandatoryCount").innerText="0";
-document.getElementById("expectedCount").innerText="0";
-document.getElementById("optionalCount").innerText="0";
-
-return;
-}
-
-document.getElementById("population").innerText=
-Number(rows[0].order_population).toLocaleString();
-
-document.getElementById("mandatoryCount").innerText=
-rows.filter(x=>x.task_type==="MANDATORY").length;
-
-document.getElementById("expectedCount").innerText=
-rows.filter(x=>x.task_type==="EXPECTED").length;
-
-document.getElementById("optionalCount").innerText=
-rows.filter(x=>x.task_type==="OPTIONAL").length;
-
-rows.sort((a,b)=>
-parseFloat(b.task_percentage)-parseFloat(a.task_percentage)
-);
-
-rows.forEach(r=>{
-
-let badgeClass="badge-optional";
-
-if(r.task_type==="MANDATORY")
-badgeClass="badge-mandatory";
-
-if(r.task_type==="EXPECTED")
-badgeClass="badge-expected";
-
-tbody.innerHTML+=`
-
-<tr>
-
-<td>${r.task_name}</td>
-
-<td>
-
-<div style="display:flex;align-items:center;gap:10px;">
-
-<div class="progress" style="width:180px;">
-<div class="progress-fill"
-style="width:${r.task_percentage}%">
-</div>
-</div>
-
-<span>${r.task_percentage}%</span>
-
-</div>
-
-</td>
-
-<td>
-<span class="badge ${badgeClass}">
-${r.task_type}
-</span>
-</td>
-
-</tr>
-
-`;
-
-});
+    renderResults();
 
 }
-```
+
+function renderResults(){
+
+    let filtered=data;
+
+    fields.forEach(field=>{
+
+        const value=
+        document.getElementById(field).value;
+
+        if(value){
+
+            filtered=
+            filtered.filter(
+                r=>r[field]===value
+            );
+
+        }
+
+    });
+
+    const tbody=
+    document.getElementById('tbody');
+
+    tbody.innerHTML='';
+
+    if(filtered.length===0){
+
+        document.getElementById('population').innerText='0';
+        document.getElementById('mandatory').innerText='0';
+        document.getElementById('expected').innerText='0';
+        document.getElementById('optional').innerText='0';
+
+        return;
+
+    }
+
+    document.getElementById('population').innerText=
+    Number(filtered[0].order_population).toLocaleString();
+
+    document.getElementById('mandatory').innerText=
+    filtered.filter(x=>x.task_type==='MANDATORY').length;
+
+    document.getElementById('expected').innerText=
+    filtered.filter(x=>x.task_type==='EXPECTED').length;
+
+    document.getElementById('optional').innerText=
+    filtered.filter(x=>x.task_type==='OPTIONAL').length;
+
+    filtered.sort(
+        (a,b)=>
+        parseFloat(b.task_percentage)
+        -
+        parseFloat(a.task_percentage)
+    );
+
+    filtered.forEach(row=>{
+
+        tbody.innerHTML+=`
+
+        <tr>
+
+            <td>${row.task_name}</td>
+
+            <td>
+
+                <div style="display:flex;align-items:center;gap:10px;">
+
+                    <div class="bar">
+
+                        <div
+                            class="fill"
+                            style="width:${row.task_percentage}%">
+                        </div>
+
+                    </div>
+
+                    ${row.task_percentage}%
+
+                </div>
+
+            </td>
+
+            <td>
+
+                <span class="badge ${row.task_type}">
+                    ${row.task_type}
+                </span>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
