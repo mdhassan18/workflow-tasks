@@ -1,0 +1,17 @@
+body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#f5f6f8}
+.topbar{background:#16325C;color:#fff;padding:22px 30px}
+.title{font-size:28px;font-weight:700}.subtitle{opacity:.85}
+.container{padding:24px}
+.panel,.card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.panel{padding:20px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#16325C}
+select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.card{padding:18px}.value{font-size:30px;font-weight:700}
+.mandatory{border-left:6px solid #16a34a}.expected{border-left:6px solid #f59e0b}.optional{border-left:6px solid #64748b}
+table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
+.bar{height:12px;background:#e5e7eb;border-radius:8px;overflow:hidden;width:220px;display:inline-block;vertical-align:middle;margin-right:10px}
+.fill{height:100%;background:#81B5A1}
+.badge{padding:6px 10px;border-radius:20px;font-weight:700}
+.MANDATORY{background:#dcfce7}.EXPECTED{background:#fef3c7}.OPTIONAL{background:#e2e8f0}

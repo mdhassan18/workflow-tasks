@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brightspeed Workflow Intelligence Platform</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+<div class="title">Brightspeed Workflow Intelligence Platform</div>
+<div class="subtitle">Historical Workflow Analysis & Task Generation Explorer</div>
+</header>
+
+<div class="container">
+<div class="panel">
+<h2>Workflow Selection</h2>
+<div id="filters" class="grid"></div>
+</div>
+
+<div class="cards">
+<div class="card"><div class="label">Workflow Population</div><div id="population" class="value">0</div></div>
+<div class="card mandatory"><div class="label">Mandatory Tasks</div><div id="mandatory" class="value">0</div></div>
+<div class="card expected"><div class="label">Expected Tasks</div><div id="expected" class="value">0</div></div>
+<div class="card optional"><div id="optional" class="value">0</div><div class="label">Optional Tasks</div></div>
+</div>
+
+<div class="panel">
+<h2>Workflow Tasks</h2>
+<table>
+<thead><tr><th>Task</th><th>Frequency</th><th>Type</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+</div>
+<script src="app.js"></script>
+</body></html>
