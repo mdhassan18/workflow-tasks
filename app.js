@@ -1,24 +1,43 @@
-const fields=['order_type','network_type','service_type','install_type','technology_type','product_type','action_type'];
+```javascript
+const FILTERS = [
+    "ORDER_TYPE",
+    "account_type",
+    "network_type",
+    "service_type",
+    "install_type",
+    "technology_type",
+    "product_type",
+    "action_type"
+];
 
-let data=[];
+let data = [];
+let currentRows = [];
 
-fetch('workflow_data.json')
-.then(r=>r.json())
-.then(d=>{
-    data=d;
-    buildFilters();
+fetch("workflow_data_v2.json")
+.then(response => response.json())
+.then(json => {
+
+    data = json;
+
+    createFilters();
+
 });
 
-function buildFilters(){
+function createFilters(){
 
-    const container=document.getElementById('filters');
+    const container =
+    document.getElementById("filters");
 
-    fields.forEach(field=>{
+    FILTERS.forEach((field,index)=>{
 
-        const div=document.createElement('div');
+        const div =
+        document.createElement("div");
 
-        div.innerHTML=`
-            <label>${field.replaceAll('_',' ').replace(/\b\w/g,m=>m.toUpperCase())}</label>
+        div.className =
+        "filter-group";
+
+        div.innerHTML = `
+            <label>${formatLabel(field)}</label>
             <select id="${field}">
                 <option value="">Select...</option>
             </select>
@@ -28,179 +47,313 @@ function buildFilters(){
 
     });
 
-    populateFromLevel(0);
+    populateDropdowns();
 
-    fields.forEach((field,index)=>{
+    FILTERS.forEach((field,index)=>{
 
         document
         .getElementById(field)
-        .addEventListener('change',()=>{
+        .addEventListener("change",()=>{
 
-            handleChange(index);
+            handleFilterChange(index);
 
         });
 
     });
 
-}
-
-function populateFromLevel(level){
-
-    for(let i=level;i<fields.length;i++){
-
-        let filtered=data;
-
-        for(let j=0;j<i;j++){
-
-            const value=
-            document.getElementById(fields[j]).value;
-
-            if(value){
-
-                filtered=
-                filtered.filter(
-                    r=>r[fields[j]]===value
-                );
-
-            }
-
-        }
-
-        const values=[
-            ...new Set(
-                filtered
-                .map(r=>r[fields[i]])
-                .filter(v=>v)
-            )
-        ].sort();
-
-        const select=
-        document.getElementById(fields[i]);
-
-        select.innerHTML=
-        `<option value="">Select...</option>`;
-
-        values.forEach(v=>{
-
-            select.innerHTML+=
-            `<option value="${v}">${v}</option>`;
-
-        });
-
-    }
+    document
+    .getElementById("taskSearch")
+    .addEventListener("input",renderTasks);
 
 }
 
-function handleChange(level){
+function populateDropdowns(){
 
-    for(let i=level+1;i<fields.length;i++){
+    FILTERS.forEach((field,index)=>{
 
+        populateDropdown(field,index);
+
+    });
+
+}
+
+function populateDropdown(field,index){
+
+    let rows = data;
+
+    for(let i=0;i<index;i++){
+
+        const prevField =
+        FILTERS[i];
+
+        const value =
         document
-        .getElementById(fields[i])
-        .value='';
-
-    }
-
-    populateFromLevel(level+1);
-
-    renderResults();
-
-}
-
-function renderResults(){
-
-    let filtered=data;
-
-    fields.forEach(field=>{
-
-        const value=
-        document.getElementById(field).value;
+        .getElementById(prevField)
+        ?.value;
 
         if(value){
 
-            filtered=
-            filtered.filter(
-                r=>r[field]===value
+            rows =
+            rows.filter(
+                r=>r[prevField]===value
             );
 
         }
 
+    }
+
+    const values =
+    [...new Set(
+        rows
+        .map(r=>r[field])
+        .filter(Boolean)
+    )]
+    .sort();
+
+    const select =
+    document.getElementById(field);
+
+    const current =
+    select.value;
+
+    select.innerHTML =
+    `<option value="">Select...</option>`;
+
+    values.forEach(v=>{
+
+        select.innerHTML +=
+        `<option value="${v}">
+            ${v}
+        </option>`;
+
     });
 
-    const tbody=
-    document.getElementById('tbody');
+    if(values.includes(current))
+        select.value=current;
+}
 
-    tbody.innerHTML='';
+function handleFilterChange(index){
 
-    if(filtered.length===0){
+    for(let i=index+1;i<FILTERS.length;i++){
 
-        document.getElementById('population').innerText='0';
-        document.getElementById('mandatory').innerText='0';
-        document.getElementById('expected').innerText='0';
-        document.getElementById('optional').innerText='0';
-
-        return;
+        document
+        .getElementById(FILTERS[i])
+        .value="";
 
     }
 
-    document.getElementById('population').innerText=
-    Number(filtered[0].order_population).toLocaleString();
+    for(let i=index+1;i<FILTERS.length;i++){
 
-    document.getElementById('mandatory').innerText=
-    filtered.filter(x=>x.task_type==='MANDATORY').length;
+        populateDropdown(
+            FILTERS[i],
+            i
+        );
 
-    document.getElementById('expected').innerText=
-    filtered.filter(x=>x.task_type==='EXPECTED').length;
+    }
 
-    document.getElementById('optional').innerText=
-    filtered.filter(x=>x.task_type==='OPTIONAL').length;
+    updateResults();
 
-    filtered.sort(
-        (a,b)=>
-        parseFloat(b.task_percentage)
-        -
-        parseFloat(a.task_percentage)
-    );
+}
 
-    filtered.forEach(row=>{
+function updateResults(){
 
-        tbody.innerHTML+=`
+    currentRows =
+    data.filter(row=>{
 
+        return FILTERS.every(field=>{
+
+            const value =
+            document
+            .getElementById(field)
+            .value;
+
+            if(!value)
+                return true;
+
+            return row[field]===value;
+
+        });
+
+    });
+
+    if(currentRows.length===0){
+
+        clearDashboard();
+
+        return;
+    }
+
+    const population =
+    currentRows[0].order_population;
+
+    document.getElementById(
+        "population"
+    ).innerText =
+    Number(population)
+    .toLocaleString();
+
+    document.getElementById(
+        "mandatoryCount"
+    ).innerText =
+    currentRows.filter(
+        r=>r.task_type==="MANDATORY"
+    ).length;
+
+    document.getElementById(
+        "expectedCount"
+    ).innerText =
+    currentRows.filter(
+        r=>r.task_type==="EXPECTED"
+    ).length;
+
+    document.getElementById(
+        "optionalCount"
+    ).innerText =
+    currentRows.filter(
+        r=>r.task_type==="OPTIONAL"
+    ).length;
+
+    buildWorkflowSummary();
+
+    renderTasks();
+
+}
+
+function buildWorkflowSummary(){
+
+    const html =
+    FILTERS.map(field=>{
+
+        const value =
+        document
+        .getElementById(field)
+        .value;
+
+        if(!value) return "";
+
+        return `
+            <b>${formatLabel(field)}:</b>
+            ${value}
+        `;
+
+    }).join("<br>");
+
+    document
+    .getElementById("workflowSummary")
+    .innerHTML = html;
+
+}
+
+function renderTasks(){
+
+    const search =
+    document
+    .getElementById("taskSearch")
+    .value
+    .toLowerCase();
+
+    const tbody =
+    document
+    .getElementById("taskTable");
+
+    tbody.innerHTML="";
+
+    currentRows
+    .filter(r=>
+        r.task_name
+        .toLowerCase()
+        .includes(search)
+    )
+    .sort((a,b)=>
+        b.task_percentage -
+        a.task_percentage
+    )
+    .forEach(row=>{
+
+        let badge =
+        "badge-optional";
+
+        if(
+            row.task_type==="MANDATORY"
+        )
+            badge=
+            "badge-mandatory";
+
+        if(
+            row.task_type==="EXPECTED"
+        )
+            badge=
+            "badge-expected";
+
+        tbody.innerHTML += `
         <tr>
 
-            <td>${row.task_name}</td>
+        <td>${row.task_name}</td>
 
-            <td>
+        <td>
 
-                <div style="display:flex;align-items:center;gap:10px;">
+        <div class="progress-bar">
 
-                    <div class="bar">
+        <div
+        class="progress-fill"
+        style="width:${row.task_percentage}%">
+        </div>
 
-                        <div
-                            class="fill"
-                            style="width:${row.task_percentage}%">
-                        </div>
+        </div>
 
-                    </div>
+        ${row.task_percentage}%
 
-                    ${row.task_percentage}%
+        </td>
 
-                </div>
+        <td>
 
-            </td>
+        <span class="badge ${badge}">
+        ${row.task_type}
+        </span>
 
-            <td>
-
-                <span class="badge ${row.task_type}">
-                    ${row.task_type}
-                </span>
-
-            </td>
+        </td>
 
         </tr>
-
         `;
 
     });
 
 }
+
+function clearDashboard(){
+
+    document
+    .getElementById("population")
+    .innerText="0";
+
+    document
+    .getElementById("mandatoryCount")
+    .innerText="0";
+
+    document
+    .getElementById("expectedCount")
+    .innerText="0";
+
+    document
+    .getElementById("optionalCount")
+    .innerText="0";
+
+    document
+    .getElementById("workflowSummary")
+    .innerHTML="";
+
+    document
+    .getElementById("taskTable")
+    .innerHTML="";
+}
+
+function formatLabel(text){
+
+    return text
+    .replaceAll("_"," ")
+    .replace(/\b\w/g,
+        c=>c.toUpperCase()
+    );
+
+}
+```
