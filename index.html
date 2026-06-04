@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Intelligence Explorer</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+
+<body>
+
+<div class="header">
+
+    <div class="logo">
+        Workflow Intelligence Explorer
+    </div>
+
+    <div class="subtitle">
+        Brightspeed Order Workflow Analytics
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="filters-card">
+
+        <h2>Workflow Filters</h2>
+
+        <div class="filters-grid">
+
+            <select id="order_type"></select>
+
+            <select id="network_type"></select>
+
+            <select id="service_type"></select>
+
+            <select id="install_type"></select>
+
+            <select id="technology_type"></select>
+
+            <select id="product_type"></select>
+
+            <select id="action_type"></select>
+
+        </div>
+
+        <button id="runBtn">
+            Run Workflow Analysis
+        </button>
+
+    </div>
+
+    <div class="summary">
+
+        <div class="summary-card">
+            <div class="label">Workflow Population</div>
+            <div class="value" id="population">-</div>
+        </div>
+
+        <div class="summary-card mandatory">
+            <div class="label">Mandatory</div>
+            <div class="value" id="mandatoryCount">0</div>
+        </div>
+
+        <div class="summary-card expected">
+            <div class="label">Expected</div>
+            <div class="value" id="expectedCount">0</div>
+        </div>
+
+        <div class="summary-card optional">
+            <div class="label">Optional</div>
+            <div class="value" id="optionalCount">0</div>
+        </div>
+
+    </div>
+
+    <div class="results-card">
+
+        <div class="results-header">
+            Workflow Tasks
+        </div>
+
+        <table id="resultsTable">
+
+            <thead>
+
+            <tr>
+                <th>Task Name</th>
+                <th>Orders With Task</th>
+                <th>Population</th>
+                <th>%</th>
+                <th>Classification</th>
+            </tr>
+
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
