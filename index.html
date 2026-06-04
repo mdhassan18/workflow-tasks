@@ -1,9 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workflow Intelligence Explorer</title>
+    <title>Brightspeed Workflow Intelligence Platform</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -12,77 +14,92 @@
 
 <body>
 
-<div class="header">
+<div class="topbar">
 
-    <div class="logo">
-        Workflow Intelligence Explorer
+    <div class="title">
+        Brightspeed Workflow Intelligence Platform
     </div>
 
     <div class="subtitle">
-        Brightspeed Order Workflow Analytics
+        Historical Workflow Analysis & Task Generation Explorer
     </div>
 
 </div>
 
 <div class="container">
 
-    <div class="filters-card">
+    <div class="filter-card">
 
-        <h2>Workflow Filters</h2>
+        <h2>Workflow Selection</h2>
 
-        <div class="filters-grid">
+        <div class="filter-grid">
 
-            <select id="order_type"></select>
+            <div>
+                <label>Order Type</label>
+                <select id="order_type"></select>
+            </div>
 
-            <select id="network_type"></select>
+            <div>
+                <label>Network Type</label>
+                <select id="network_type"></select>
+            </div>
 
-            <select id="service_type"></select>
+            <div>
+                <label>Service Type</label>
+                <select id="service_type"></select>
+            </div>
 
-            <select id="install_type"></select>
+            <div>
+                <label>Install Type</label>
+                <select id="install_type"></select>
+            </div>
 
-            <select id="technology_type"></select>
+            <div>
+                <label>Technology Type</label>
+                <select id="technology_type"></select>
+            </div>
 
-            <select id="product_type"></select>
+            <div>
+                <label>Product Type</label>
+                <select id="product_type"></select>
+            </div>
 
-            <select id="action_type"></select>
+            <div>
+                <label>Action Type</label>
+                <select id="action_type"></select>
+            </div>
 
         </div>
-
-        <button id="runBtn">
-            Run Workflow Analysis
-        </button>
 
     </div>
 
-    <div class="summary">
+    <div class="summary-row">
 
-        <div class="summary-card">
-            <div class="label">Workflow Population</div>
-            <div class="value" id="population">-</div>
+        <div class="card">
+            <span>Workflow Population</span>
+            <h1 id="population">0</h1>
         </div>
 
-        <div class="summary-card mandatory">
-            <div class="label">Mandatory</div>
-            <div class="value" id="mandatoryCount">0</div>
+        <div class="card mandatory">
+            <span>Mandatory Tasks</span>
+            <h1 id="mandatoryCount">0</h1>
         </div>
 
-        <div class="summary-card expected">
-            <div class="label">Expected</div>
-            <div class="value" id="expectedCount">0</div>
+        <div class="card expected">
+            <span>Expected Tasks</span>
+            <h1 id="expectedCount">0</h1>
         </div>
 
-        <div class="summary-card optional">
-            <div class="label">Optional</div>
-            <div class="value" id="optionalCount">0</div>
+        <div class="card optional">
+            <span>Optional Tasks</span>
+            <h1 id="optionalCount">0</h1>
         </div>
 
     </div>
 
     <div class="results-card">
 
-        <div class="results-header">
-            Workflow Tasks
-        </div>
+        <h2>Workflow Tasks</h2>
 
         <table id="resultsTable">
 
@@ -90,9 +107,7 @@
 
             <tr>
                 <th>Task Name</th>
-                <th>Orders With Task</th>
-                <th>Population</th>
-                <th>%</th>
+                <th>Frequency</th>
                 <th>Classification</th>
             </tr>
 
@@ -110,3 +125,4 @@
 
 </body>
 </html>
+```
